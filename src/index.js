@@ -5,6 +5,8 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const tokenGenerator = require('./utilits/tokenGenerator');
+const verifyEmail = require('./utilits/middlewares/emailValidation');
+const verifyPassword = require('./utilits/middlewares/passwordValidation');
 
 const app = express();
 app.use(express.json());
@@ -52,7 +54,7 @@ app.get('/talker/:id', async (req, res) => {
   }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login', verifyEmail, verifyPassword, (req, res) => {
     const token = tokenGenerator();
     return res.status(HTTP_OK_STATUS).json({ token });
 });
