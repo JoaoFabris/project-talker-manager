@@ -4,6 +4,8 @@ const fs = require('fs').promises;
 
 const path = require('path');
 
+const tokenGenerator = require('./utilits/tokenGenerator');
+
 const app = express();
 app.use(express.json());
 
@@ -48,6 +50,11 @@ app.get('/talker/:id', async (req, res) => {
   } catch (error) {
     return res.status(404).send({ message: 'Pessoa palestrante não encontrada' });
   }
+});
+
+app.post('/login', async (req, res) => {
+    const token = tokenGenerator();
+    return res.status(HTTP_OK_STATUS).json({ token });
 });
 
 module.exports = app;
