@@ -101,4 +101,17 @@ talkValidation, verifyRate2, rateValidation, async (req, res) => {
   }
 });
 
+app.delete('/talker/:id', verifyAuthorization, async (req, res) => {
+  try {
+    const data = await readFile();
+    const { id } = req.params;
+    const getID = data.filter((each) => each.id !== Number(id));
+    const uptadeDeleteData = JSON.stringify(getID, null, 2);
+    await fs.writeFile(talkerPath, uptadeDeleteData);
+    return res.status(204).send({ message: 'Deletado' });
+  } catch (error) {
+    res.status(500).send({ message: 'ID not found' });
+  }
+});
+
 module.exports = app;
