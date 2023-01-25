@@ -7,6 +7,11 @@ const path = require('path');
 const tokenGenerator = require('./utilits/tokenGenerator');
 const verifyEmail = require('./utilits/middlewares/emailValidation');
 const verifyPassword = require('./utilits/middlewares/passwordValidation');
+const verifyAuthorization = require('./utilits/middlewares/newTalkerValidation');
+const nameValidation = require('./utilits/middlewares/nameValidation');
+const talkValidation = require('./utilits/middlewares/talkValidation');
+const rateValidation = require('./utilits/middlewares/rateValidation');
+const ageValidation = require('./utilits/middlewares/ageValidation');
 
 const app = express();
 app.use(express.json());
@@ -57,6 +62,23 @@ app.get('/talker/:id', async (req, res) => {
 app.post('/login', verifyEmail, verifyPassword, (req, res) => {
     const token = tokenGenerator();
     return res.status(HTTP_OK_STATUS).json({ token });
+});
+
+app.post('/talker', verifyAuthorization, nameValidation, ageValidation, 
+talkValidation, rateValidation, 
+  async (req, res) => {
+  const { name, age, talk } = req.body;
+  const data = await readFile();
+  const id = data.length + 1;
+  const newTalker = {
+    id,
+    name,
+    age,
+    talk,
+  };
+  const newData = JSON.stringify([...data, newTalker], null, 2);
+  await fs.writeFile(talkerPath, newData);
+  return res.status(201).json(newTalker);
 });
 
 module.exports = app;
