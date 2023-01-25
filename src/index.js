@@ -50,14 +50,13 @@ app.get('/talker', async (req, res) => {
 });
 
 app.get('/talker/:id', async (req, res) => {
-  try {
     const { id } = req.params;
     const data = await readFile();
     const findId = data.find((each) => each.id === Number(id));
-    return res.status(HTTP_OK_STATUS).json(findId);
-  } catch (error) {
-    return res.status(404).send({ message: 'Pessoa palestrante não encontrada' });
-  }
+    if (findId) {
+      return res.status(HTTP_OK_STATUS).json(findId);
+    }
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
 });
 
 app.post('/login', verifyEmail, verifyPassword, (req, res) => {
