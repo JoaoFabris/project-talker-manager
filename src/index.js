@@ -40,6 +40,16 @@ const readFile = async () => {
   }
 };
 
+app.get('/talker/search', verifyAuthorization, async (req, res) => {
+  const { q } = req.query;
+  const data = await readFile();
+  if (!q) {
+    return res.status(200).json(data);
+  }
+  const listFiltered = data.filter((each) => each.name.includes(q));
+  return res.status(200).json(listFiltered);
+});
+
 app.get('/talker', async (req, res) => {
   try {
     const talker = await readFile();
