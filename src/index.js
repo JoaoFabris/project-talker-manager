@@ -12,6 +12,7 @@ const nameValidation = require('./utilits/middlewares/nameValidation');
 const talkValidation = require('./utilits/middlewares/talkValidation');
 const rateValidation = require('./utilits/middlewares/rateValidation');
 const ageValidation = require('./utilits/middlewares/ageValidation');
+const verifyRate2 = require('./utilits/middlewares/rateValidation2');
 
 const app = express();
 app.use(express.json());
@@ -32,7 +33,7 @@ const talkerPath = path.resolve(__dirname, './talker.json');
 
 const readFile = async () => {
   try {
-    const data = await fs.readFile(talkerPath);
+    const data = await fs.readFile(talkerPath, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
     console.log(error.message);
@@ -65,7 +66,7 @@ app.post('/login', verifyEmail, verifyPassword, (req, res) => {
 });
 
 app.post('/talker', verifyAuthorization, nameValidation, ageValidation, 
-talkValidation, rateValidation, 
+talkValidation, verifyRate2, rateValidation,
   async (req, res) => {
   const { name, age, talk } = req.body;
   const data = await readFile();
@@ -79,6 +80,25 @@ talkValidation, rateValidation,
   const newData = JSON.stringify([...data, newTalker], null, 2);
   await fs.writeFile(talkerPath, newData);
   return res.status(201).json(newTalker);
+});
+
+app.put('/talker/:id', verifyAuthorization, nameValidation, ageValidation, 
+talkValidation, verifyRate2, rateValidation, async (req, res) => {
+  try {
+    const data = await readFile();
+    const { id } = req.params;
+    const { name, age, talk: { watchedAt, rate } } = req.body;
+    const getId = data.find((each) => each.id === Number(id));
+    getId.name = name;
+    getId.age = age;
+    getId.talk.watchedAt = watchedAt;
+    getId.talk.rate = rate;
+    const editData = JSON.stringify(data);
+    await fs.writeFile(talkerPath, editData);
+    return res.status(200).json(getId);
+  } catch (error) {
+    res.status(500).send({ message: 'ID not found' });
+  }
 });
 
 module.exports = app;
