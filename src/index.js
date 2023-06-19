@@ -69,7 +69,7 @@ app.get('/talker/:id', async (req, res) => {
     return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
 });
 
-app.post('/login', verifyEmail, verifyPassword, (req, res) => {
+app.post('/login', verifyEmail, verifyPassword, (_req, res) => {
     const token = tokenGenerator();
     return res.status(HTTP_OK_STATUS).json({ token });
 });
